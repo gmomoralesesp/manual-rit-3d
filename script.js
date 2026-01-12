@@ -10,6 +10,7 @@ const ritData = [
     { id: 5, name: "Sala SOTI / SOTS", desc: "Salas de Operaciones de Telecomunicaciones. SOTI ubicada en sótano, SOTS en azotea. Centro neurálgico de la RIT.", pos: [0, -1.05, 0], category: 'trunk', color: '#ff4d00' },
     { id: 6, name: "Canalización troncal", desc: "Shaft vertical que recorre todos los pisos del edificio. Es la columna vertebral de toda la RIT.", pos: [0, 8, 0], category: 'trunk', color: '#ff4d00' },
     { id: 7, name: "Cajas de distribución (BUDI)", desc: "Building Distribution Box. Punto de derivación en cada piso para conexión hacia los departamentos.", pos: [0.8, 7, 1.2], category: 'distribution', color: '#6c757d' },
+    // CORREGIDO: Ajuste de posición de ID 8 para coincidir con el centro geométrico de la antena
     { id: 8, name: "Captación de señal", desc: "Antenas satelitales y sistemas de recepción ubicados en la azotea del edificio.", pos: [0, 16, 0], category: 'trunk', color: '#ffffff' },
     { id: 9, name: "Canalización lateral", desc: "Tubería horizontal que va desde el shaft troncal hasta la CTR de cada departamento.", pos: [2.5, 7, 1], category: 'lateral', color: '#00b4d8' },
     { id: 10, name: "Caja Terminación (CTR)", desc: "Caja terminal domiciliaria con 2 pelos de fibra óptica. Se ubica generalmente sobre la puerta interior del departamento.", pos: [4.8, 7.5, 1], category: 'lateral', color: '#ffffff' },
@@ -238,6 +239,7 @@ function createLabel(id, name, position) {
         white-space: nowrap;
         box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         border: 1px solid rgba(255,255,255,0.2);
+        display: none;
     `;
     div.innerHTML = `<span style="font-weight:700; margin-right:5px;">${id}</span>${name}`;
     
@@ -693,6 +695,7 @@ toggleLabelsBtn.onclick = () => {
     
     Object.values(labelMap).forEach(label => {
         label.visible = showLabels;
+        label.element.style.display = showLabels ? 'block' : 'none';
     });
 };
 
