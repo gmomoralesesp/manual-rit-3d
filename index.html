@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manual 3D RIT - Estructura Completa</title>
+    <title>Manual Técnico RIT 3D</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -11,7 +11,7 @@
 
 <div id="loading">
     <div class="loader"></div>
-    <p>Cargando modelo técnico RIT...</p>
+    <p>Cargando Infraestructura RIT Completa...</p>
 </div>
 
 <div id="side-panel">
@@ -20,54 +20,35 @@
         <div class="subtitle">Ley de Ductos 20.808 - Chile</div>
     </div>
     <div class="panel-content">
-        <div class="instruccion">
-            🖱️ Haz clic en un componente para inspeccionarlo.
-        </div>
-        <div class="section-title">Componentes de la Red</div>
+        <div class="instruccion">🖱️ Selecciona un componente para inspeccionar la red.</div>
         <div id="menu-items"></div>
     </div>
 </div>
 
-<button id="toggle-labels">Mostrar Etiquetas</button>
-
-<div id="view-presets">
-    <button class="preset-btn" data-view="front">Vista Frontal</button>
-    <button class="preset-btn" data-view="side">Vista Lateral</button>
-    <button class="preset-btn" data-view="top">Vista Superior</button>
-    <button class="preset-btn" data-view="iso">Vista Isométrica</button>
-</div>
-
 <div id="nav-controls">
     <div class="nav-group">
-        <div class="nav-group-label">Rotar</div>
-        <button class="nav-btn" data-action="rotate-left">⬅️</button>
-        <button class="nav-btn" data-action="rotate-right">➡️</button>
+        <div class="nav-label">Vistas</div>
+        <button class="preset-btn" data-view="front">Frontal</button>
+        <button class="preset-btn" data-view="side">Lateral</button>
+        <button class="preset-btn" data-view="iso">3D</button>
     </div>
-    <div class="nav-group">
-        <div class="nav-group-label">Zoom</div>
-        <button class="nav-btn" data-action="zoom-in">➕</button>
-        <button class="nav-btn" data-action="zoom-out">➖</button>
-    </div>
-    <div class="nav-group">
-        <div class="nav-group-label">Reset</div>
-        <button class="nav-btn reset-btn" data-action="reset">🏠</button>
-    </div>
+    <button id="reset-view" class="nav-btn">🏠 Reset</button>
 </div>
 
 <div id="legend">
-    <b>📋 REFERENCIA TÉCNICA</b>
-    <div class="legend-item"><span class="color-dot" style="background: #ff4d00;"></span> Infraestructura Troncal</div>
-    <div class="legend-item"><span class="color-dot" style="background: #00b4d8;"></span> Red Lateral / Fibra</div>
-    <div class="legend-item"><span class="color-dot" style="background: #28a745;"></span> Flujo de Datos</div>
+    <b>📋 CÓDIGO DE COLORES</b>
+    <div class="item"><span class="dot" style="background: #ff4d00;"></span> Canalización Troncal</div>
+    <div class="item"><span class="dot" style="background: #00b4d8;"></span> Red Lateral (Fibra)</div>
+    <div class="item"><span class="dot" style="background: #28a745;"></span> Flujo de Datos</div>
 </div>
 
-<div id="tooltip"></div>
-
 <div id="info-panel">
-    <div class="info-number">1</div>
-    <button class="info-close">×</button>
-    <div class="info-title">Título</div>
-    <div class="info-desc">Descripción</div>
+    <div class="info-header">
+        <div class="info-number">0</div>
+        <h3 class="info-title">Título</h3>
+    </div>
+    <p class="info-desc">Descripción</p>
+    <button class="info-close">Cerrar detalle</button>
 </div>
 
 <div id="container"></div>
