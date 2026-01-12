@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
-// --- CONFIGURACIÓN DE DATOS ---
+// --- DATOS ---
 const ritData = [
     { id: 1, name: "Cámara de acceso", desc: "Punto de entrada de los proveedores externos de telecomunicaciones (BNUP).", pos: [18, -1.3, 0], color: '#6c757d' },
     { id: 2, name: "Canalización externa", desc: "Tubería subterránea desde la calle hasta el predio.", pos: [14, -1.5, 0], color: '#ff4d00' },
@@ -22,79 +22,99 @@ const ritData = [
 let scene, camera, renderer, labelRenderer, controls;
 let meshMap = {};
 let labelMap = {};
-let particles;
 let glowMeshes = [];
 let savedMaterialsState = [];
 let activeItem = null;
+let requestID;
 
-// --- INICIALIZACIÓN ---
+// --- INICIALIZACIÓN SEGURA ---
 function init() {
-    const container = document.getElementById('container');
+    try {
+        console.log("Iniciando Three.js...");
+        const container = document.getElementById('container');
+        if(!container) throw new Error("No se encontró el div #container");
 
-    // 1. Escena y Niebla (para profundidad)
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xf0f2f5); // Color gris claro limpio
-    scene.fog = new THREE.Fog(0xf0f2f5, 40, 100);
+        // 1. Escena
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xf0f2f5);
+        scene.fog = new THREE.Fog(0xf0f2f5, 40, 100);
 
-    // 2. Cámara (Posición isométrica inicial)
-    camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(35, 25, 35);
+        // 2. Cámara
+        camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(35, 25, 35);
 
-    // 3. Renderer
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Sombras suaves
-    container.appendChild(renderer.domElement);
+        // 3. Renderer
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container.appendChild(renderer.domElement);
 
-    // 4. Label Renderer (Etiquetas HTML flotantes)
-    labelRenderer = new CSS2DRenderer();
-    labelRenderer.setSize(window.innerWidth, window.innerHeight);
-    labelRenderer.domElement.style.position = 'absolute';
-    labelRenderer.domElement.style.top = '0';
-    labelRenderer.domElement.style.pointerEvents = 'none';
-    container.appendChild(labelRenderer.domElement);
+        // 4. Etiquetas
+        labelRenderer = new CSS2DRenderer();
+        labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        labelRenderer.domElement.style.position = 'absolute';
+        labelRenderer.domElement.style.top = '0';
+        labelRenderer.domElement.style.pointerEvents = 'none';
+        container.appendChild(labelRenderer.domElement);
 
-    // 5. Controles
-    controls = new OrbitControls(camera, renderer.domElement);
-    controls.target.set(0, 6, 0);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-    controls.maxPolarAngle = Math.PI / 2 - 0.05; // No permitir ir bajo el suelo
+        // 5. Controles
+        controls = new OrbitControls(camera, renderer.domElement);
+        controls.target.set(0, 6, 0);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
 
-    // --- ILUMINACIÓN (Más fuerte para evitar el look gris) ---
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.9); // Luz ambiente alta
-    scene.add(ambientLight);
+        // --- ILUMINACIÓN ---
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+        scene.add(ambientLight);
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
-    dirLight.position.set(20, 40, 20);
-    dirLight.castShadow = true;
-    dirLight.shadow.mapSize.width = 2048;
-    dirLight.shadow.mapSize.height = 2048;
-    scene.add(dirLight);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        dirLight.position.set(20, 40, 20);
+        dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = 2048;
+        dirLight.shadow.mapSize.height = 2048;
+        scene.add(dirLight);
 
-    const fillLight = new THREE.DirectionalLight(0xddeeff, 0.6); // Luz de relleno azulada
-    fillLight.position.set(-10, 10, -10);
-    scene.add(fillLight);
+        const fillLight = new THREE.DirectionalLight(0xddeeff, 0.6);
+        fillLight.position.set(-10, 10, -10);
+        scene.add(fillLight);
 
-    // --- CONSTRUCCIÓN DEL MUNDO ---
-    buildEnvironment();
-    buildBuilding();
-    buildRITElements();
-    setupParticles();
+        // --- CONSTRUCCIÓN ---
+        buildEnvironment();
+        buildBuilding();
+        buildRITElements();
+        setupParticles();
 
-    // --- INTERFAZ DE USUARIO ---
-    createMenu();
-    setupEventListeners();
+        // --- UI ---
+        createMenu();
+        setupEventListeners();
 
-    // Ocultar carga
-    setTimeout(() => {
-        document.getElementById('loading').classList.add('hidden');
-    }, 1000);
+        // --- OCULTAR CARGA ---
+        // Forzamos que se oculte el loading incluso si tardó un poco
+        const loader = document.getElementById('loading');
+        if(loader) {
+            setTimeout(() => {
+                loader.classList.add('hidden');
+            }, 800);
+        }
 
-    // Loop de animación
-    animate();
+        // Loop
+        animate();
+        console.log("Three.js iniciado correctamente.");
+
+    } catch (err) {
+        console.error("Error crítico en init():", err);
+        // Mostrar error en pantalla
+        const loader = document.getElementById('loading');
+        const errLog = document.getElementById('error-log');
+        const loadText = document.getElementById('loading-text');
+        if(loadText) loadText.innerText = "Error en la aplicación 3D";
+        if(errLog) {
+            errLog.style.display = 'block';
+            errLog.innerText = err.message;
+        }
+    }
 }
 
 // --- MATERIALES ---
@@ -105,33 +125,27 @@ const mats = {
     }),
     concrete: new THREE.MeshStandardMaterial({ color: 0xe0e0e0, roughness: 0.5 }),
     floor: new THREE.MeshStandardMaterial({ color: 0xf5f5f5, roughness: 0.8 }),
-    ground: new THREE.MeshStandardMaterial({ color: 0xd0d4d8, roughness: 1 }), // Suelo más oscuro para contraste
-    highlight: new THREE.Color(0xffffff)
+    ground: new THREE.MeshStandardMaterial({ color: 0xd0d4d8, roughness: 1 }),
 };
 
-// --- ENTORNO ---
 function buildEnvironment() {
-    // Suelo
     const ground = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), mats.ground);
     ground.rotation.x = -Math.PI / 2;
     ground.position.y = -2;
     ground.receiveShadow = true;
     scene.add(ground);
 
-    // Calle
     const street = new THREE.Mesh(new THREE.PlaneGeometry(8, 100), new THREE.MeshStandardMaterial({ color: 0x333333 }));
     street.rotation.x = -Math.PI / 2;
     street.position.set(22, -1.95, 0);
     street.receiveShadow = true;
     scene.add(street);
 
-    // Grid auxiliar
     const grid = new THREE.GridHelper(100, 50, 0xbbbbbb, 0xdddddd);
     grid.position.y = -1.99;
     scene.add(grid);
 }
 
-// --- EDIFICIO ---
 function buildBuilding() {
     const group = new THREE.Group();
     const floors = 5;
@@ -141,15 +155,12 @@ function buildBuilding() {
 
     for (let i = 0; i < floors; i++) {
         const y = i * h;
-        
-        // Losa (Piso)
         const slab = new THREE.Mesh(new THREE.BoxGeometry(w, 0.2, d), mats.floor);
         slab.position.y = y;
         slab.castShadow = true;
         slab.receiveShadow = true;
         group.add(slab);
 
-        // Columnas
         const colPos = [[-w/2+0.5, d/2-0.5], [w/2-0.5, d/2-0.5], [-w/2+0.5, -d/2+0.5], [w/2-0.5, -d/2+0.5]];
         colPos.forEach(pos => {
             const col = new THREE.Mesh(new THREE.BoxGeometry(0.6, h, 0.6), mats.concrete);
@@ -158,7 +169,6 @@ function buildBuilding() {
             group.add(col);
         });
 
-        // Vidrios (solo pisos superiores)
         if (i > 0) {
             const glassF = new THREE.Mesh(new THREE.PlaneGeometry(w-1, h-0.2), mats.glass);
             glassF.position.set(0, y + h/2, d/2);
@@ -171,13 +181,11 @@ function buildBuilding() {
         }
     }
     
-    // Techo
     const roof = new THREE.Mesh(new THREE.BoxGeometry(w+1, 0.5, d+1), mats.concrete);
     roof.position.y = floors * h;
     roof.castShadow = true;
     group.add(roof);
 
-    // Sótano (transparente)
     const basement = new THREE.Mesh(new THREE.BoxGeometry(w, 2, d), new THREE.MeshBasicMaterial({ color: 0x555555, wireframe: true, transparent: true, opacity: 0.3 }));
     basement.position.y = -1;
     group.add(basement);
@@ -185,79 +193,59 @@ function buildBuilding() {
     scene.add(group);
 }
 
-// --- ELEMENTOS RIT ---
 function buildRITElements() {
-    // Geometrías base
     const geoCam = new THREE.BoxGeometry(1.5, 1.2, 1.5);
-    const geoPipe = new THREE.CylinderGeometry(0.2, 0.2, 1, 16);
     const geoBox = new THREE.BoxGeometry(0.8, 1, 0.5);
     
-    // Materiales con color intenso
     const matOrange = new THREE.MeshStandardMaterial({ color: 0xff4d00, roughness: 0.3 });
     const matGrey = new THREE.MeshStandardMaterial({ color: 0x6c757d, roughness: 0.4 });
     const matBlue = new THREE.MeshStandardMaterial({ color: 0x00b4d8, roughness: 0.3 });
     const matYellow = new THREE.MeshStandardMaterial({ color: 0xffc107, roughness: 0.3 });
 
-    // 1. Cámara Acceso
+    // Elementos base
     const c1 = new THREE.Mesh(geoCam, matGrey);
     c1.position.set(18, -1.3, 0);
     scene.add(c1); meshMap[1] = c1;
 
-    // 2. Canalización Externa
     const p2 = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 8), matOrange);
     p2.rotation.z = Math.PI / 2;
     p2.position.set(14, -1.5, 0);
     scene.add(p2); meshMap[2] = p2;
 
-    // 3. Cámara Paso
     const c3 = c1.clone();
     c3.position.set(8, -1.3, 0);
     scene.add(c3); meshMap[3] = c3;
 
-    // 4. Enlace
-    const p4 = p2.clone(); // reusar geometria pero ajustar longitud visualmente si es necesario
-    p4.scale.y = 1; // 8 unidades
+    const p4 = p2.clone();
     p4.position.set(4, -1.2, 0);
     scene.add(p4); meshMap[4] = p4;
 
-    // 5. Salas SOTI
     const soti = new THREE.Mesh(new THREE.BoxGeometry(3, 2, 2.5), matOrange);
     soti.position.set(0, -1, 0);
     scene.add(soti); meshMap[5] = soti;
 
-    const sots = soti.clone();
-    sots.position.set(0, 16, 0);
-    scene.add(sots);
-
-    // 6. Troncal (Shaft)
     const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 16), matOrange);
     shaft.position.set(0, 7, 0);
     scene.add(shaft); meshMap[6] = shaft;
 
-    // Loop para pisos
     for (let i = 0; i < 5; i++) {
         const y = i * 3 + 1.2;
-
-        // 7. BUDI
         const budi = new THREE.Mesh(geoBox, matGrey);
         budi.position.set(0.8, y, 1);
         scene.add(budi);
         if (i===2) meshMap[7] = budi;
 
-        // 9. Lateral (Tubo Azul)
         const lat = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 4), matBlue);
         lat.rotation.z = Math.PI / 2;
         lat.position.set(3, y, 1);
         scene.add(lat);
         if (i===2) meshMap[9] = lat;
 
-        // 10. CTR
         const ctr = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.6, 0.2), new THREE.MeshStandardMaterial({color: 0xffffff}));
         ctr.position.set(5.2, y, 1);
         scene.add(ctr);
         if (i===2) meshMap[10] = ctr;
 
-        // 11. Interna
         const intern = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 3), matBlue);
         intern.rotation.z = Math.PI / 2;
         intern.rotation.y = -0.5;
@@ -265,14 +253,12 @@ function buildRITElements() {
         scene.add(intern);
         if (i===2) meshMap[11] = intern;
 
-        // 12. Tomas
         const toma = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.3, 0.05), matYellow);
         toma.position.set(8, y, 2.2);
         scene.add(toma);
         if (i===2) meshMap[12] = toma;
     }
 
-    // 8. Antena
     const antGroup = new THREE.Group();
     const dish = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 16, 0, 6.3, 0, 1.2), new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}));
     dish.rotation.x = Math.PI;
@@ -282,12 +268,10 @@ function buildRITElements() {
     glow.position.set(0, 1.5, 0);
     antGroup.add(glow);
     glowMeshes.push(glow);
-
     antGroup.position.set(0, 17.5, 0);
     scene.add(antGroup);
     meshMap[8] = antGroup;
 
-    // Crear Etiquetas
     ritData.forEach(d => {
         const div = document.createElement('div');
         div.className = 'label-tag';
@@ -301,19 +285,18 @@ function buildRITElements() {
 }
 
 function setupParticles() {
-    // Sistema simple de partículas (visual)
     const geom = new THREE.BufferGeometry();
     const count = 50;
     const pos = new Float32Array(count * 3);
-    for(let i=0; i<count*3; i++) pos[i] = (Math.random()-0.5) * 50; // Random inicial
+    for(let i=0; i<count*3; i++) pos[i] = (Math.random()-0.5) * 50; 
     geom.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    particles = new THREE.Points(geom, new THREE.PointsMaterial({color: 0x00ff00, size: 0.3, transparent: true, opacity: 0}));
+    const particles = new THREE.Points(geom, new THREE.PointsMaterial({color: 0x00ff00, size: 0.3, transparent: true, opacity: 0}));
     scene.add(particles);
 }
 
-// --- LÓGICA DE UI Y EVENTOS ---
 function createMenu() {
     const container = document.getElementById('menu-items');
+    if(!container) return;
     ritData.forEach(item => {
         const div = document.createElement('div');
         div.className = 'rit-item';
@@ -331,23 +314,24 @@ function createMenu() {
 }
 
 function selectItem(id) {
-    // Resetear previos
-    savedMaterialsState.forEach(s => s.mesh.material.emissive.setHex(0x000000));
+    savedMaterialsState.forEach(s => {
+        if(s.mesh.material && s.mesh.material.emissive) s.mesh.material.emissive.setHex(0x000000);
+    });
     savedMaterialsState = [];
     document.querySelectorAll('.rit-item').forEach(el => el.classList.remove('active'));
 
     activeItem = id;
+    if(id === -1) return;
+
     const data = ritData.find(d => d.id === id);
     if (!data) return;
 
-    // Highlight menú
     const btn = document.querySelector(`.rit-item[data-id="${id}"]`);
     if(btn) {
         btn.classList.add('active');
         btn.scrollIntoView({behavior: 'smooth', block: 'center'});
     }
 
-    // Highlight 3D
     const targetObj = meshMap[id];
     if (targetObj) {
         const meshes = [];
@@ -357,27 +341,25 @@ function selectItem(id) {
         meshes.forEach(m => {
             if(m.material && m.material.emissive) {
                 savedMaterialsState.push({mesh: m});
-                m.material.emissive.setHex(0x555555); // Brillo grisáceo al seleccionar
+                m.material.emissive.setHex(0x555555);
             }
         });
 
-        // Mover Cámara
         const targetPos = new THREE.Vector3(data.pos[0], data.pos[1], data.pos[2]);
         const offset = new THREE.Vector3(10, 5, 10);
-        
         moveCamera(targetPos.clone().add(offset), targetPos);
         
-        // Mostrar Panel Info
         const info = document.getElementById('info-panel');
-        info.querySelector('.info-number').textContent = id;
-        info.querySelector('.info-title').textContent = data.name;
-        info.querySelector('.info-desc').textContent = data.desc;
-        info.classList.add('visible');
+        if(info) {
+            info.querySelector('.info-number').textContent = id;
+            info.querySelector('.info-title').textContent = data.name;
+            info.querySelector('.info-desc').textContent = data.desc;
+            info.classList.add('visible');
+        }
     }
 }
 
 function moveCamera(pos, target) {
-    // Interpolación simple
     const startPos = camera.position.clone();
     const startTarget = controls.target.clone();
     let t = 0;
@@ -393,7 +375,6 @@ function moveCamera(pos, target) {
 }
 
 function setupEventListeners() {
-    // Botones Vistas
     document.querySelectorAll('.preset-btn').forEach(btn => {
         btn.onclick = () => {
             const v = btn.dataset.view;
@@ -404,25 +385,27 @@ function setupEventListeners() {
         };
     });
 
-    // Etiquetas Toggle
-    let showLabels = false;
-    document.getElementById('toggle-labels').onclick = (e) => {
-        showLabels = !showLabels;
-        e.currentTarget.classList.toggle('active');
-        Object.values(labelMap).forEach(l => l.element.style.display = showLabels ? 'block' : 'none');
-    };
+    const toggleLabels = document.getElementById('toggle-labels');
+    if(toggleLabels) {
+        let showLabels = false;
+        toggleLabels.onclick = (e) => {
+            showLabels = !showLabels;
+            e.currentTarget.classList.toggle('active');
+            Object.values(labelMap).forEach(l => l.element.style.display = showLabels ? 'block' : 'none');
+        };
+    }
 
-    // Close info
-    document.querySelector('.info-close').onclick = () => document.getElementById('info-panel').classList.remove('visible');
+    const closeInfo = document.querySelector('.info-close');
+    if(closeInfo) closeInfo.onclick = () => document.getElementById('info-panel').classList.remove('visible');
 
-    // Reset general
-    document.querySelector('.nav-btn[data-action="reset"]').onclick = () => {
-        selectItem(-1); // Deseleccionar
+    const resetBtn = document.querySelector('.nav-btn[data-action="reset"]');
+    if(resetBtn) resetBtn.onclick = () => {
+        selectItem(-1);
         moveCamera(new THREE.Vector3(35, 25, 35), new THREE.Vector3(0, 6, 0));
-        document.getElementById('info-panel').classList.remove('visible');
+        const info = document.getElementById('info-panel');
+        if(info) info.classList.remove('visible');
     };
 
-    // Raycaster para clicks en 3D
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     
@@ -436,7 +419,6 @@ function setupEventListeners() {
         const intersects = raycaster.intersectObjects(scene.children, true);
         if(intersects.length > 0) {
             let foundId = null;
-            // Buscar si el objeto intersectado pertenece a algún ID
             for (const [id, obj] of Object.entries(meshMap)) {
                 obj.traverse(c => { if(c === intersects[0].object) foundId = id; });
                 if(obj === intersects[0].object) foundId = id;
@@ -445,8 +427,8 @@ function setupEventListeners() {
         }
     });
 
-    // Resize
     window.addEventListener('resize', () => {
+        if(!camera || !renderer) return;
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -454,23 +436,21 @@ function setupEventListeners() {
     });
 }
 
-// --- ANIMACIÓN ---
 let time = 0;
 function animate() {
-    requestAnimationFrame(animate);
+    requestID = requestAnimationFrame(animate);
     time += 0.05;
-    controls.update();
+    if(controls) controls.update();
 
-    // Pulse effects
     if (activeItem) {
         const i = 0.5 + Math.sin(time) * 0.5;
         savedMaterialsState.forEach(s => s.mesh.material.emissiveIntensity = i);
     }
     glowMeshes.forEach(m => m.scale.setScalar(1 + Math.sin(time)*0.2));
 
-    renderer.render(scene, camera);
-    labelRenderer.render(scene, camera);
+    if(renderer && scene && camera) renderer.render(scene, camera);
+    if(labelRenderer && scene && camera) labelRenderer.render(scene, camera);
 }
 
-// Iniciar todo
+// Iniciar con seguridad
 init();
