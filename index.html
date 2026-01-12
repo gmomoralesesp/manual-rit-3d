@@ -3,19 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Manual 3D RIT - Estructura Completa</title>
+    <title>Manual 3D RIT - HD</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Pantalla de carga -->
     <div id="loading">
         <div class="loader"></div>
-        <p id="loading-text">Cargando modelo de alta definición...</p>
+        <p id="loading-text">Cargando visualización de alta calidad...</p>
     </div>
 
-    <!-- Panel Lateral Izquierdo -->
+    <!-- Panel Lateral -->
     <div id="side-panel">
         <div class="panel-header">
             <h1>🏢 Estructura RIT</h1>
@@ -23,22 +22,20 @@
         </div>
         <div class="panel-content">
             <div class="instruccion">
-                🖱️ Selecciona un componente para inspeccionar.
+                🖱️ Selecciona un componente de la lista:
             </div>
-            <div class="section-title">Componentes de la Red</div>
             <div id="menu-items"></div>
         </div>
     </div>
 
-    <!-- Botón Etiquetas -->
+    <!-- Botones Superiores -->
     <button id="toggle-labels">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M7 7h10v10M7 17L17 7"/>
         </svg>
-        Mostrar Etiquetas
+        Etiquetas
     </button>
 
-    <!-- Botones de Vistas (Iconos) -->
     <div id="view-presets">
         <button class="preset-btn" data-view="iso" title="Isométrica">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
@@ -54,23 +51,21 @@
         </button>
     </div>
 
-    <!-- Controles de Navegación Inferior -->
+    <!-- Controles Navegación -->
     <div id="nav-controls">
-        <div class="nav-group">
-            <button class="nav-btn reset-btn" data-action="reset" title="Restablecer">⟲ Reset</button>
-        </div>
+        <button class="nav-btn reset-btn" data-action="reset">⟲ Reiniciar Vista</button>
     </div>
 
     <!-- Leyenda -->
     <div id="legend">
         <b>REFERENCIA</b>
-        <div class="legend-item"><span class="color-dot" style="background: #ff4d00;"></span><span>Troncal</span></div>
-        <div class="legend-item"><span class="color-dot" style="background: #00b4d8;"></span><span>Lateral</span></div>
+        <div class="legend-item"><span class="color-dot" style="background: #ff4d00;"></span><span>Troncal RIT</span></div>
+        <div class="legend-item"><span class="color-dot" style="background: #00b4d8;"></span><span>Red Lateral</span></div>
         <div class="legend-item"><span class="color-dot" style="background: #6c757d;"></span><span>Cámaras</span></div>
         <div class="legend-item"><span class="color-dot" style="background: #ffc107;"></span><span>Usuario</span></div>
     </div>
 
-    <!-- Panel de Información -->
+    <!-- Info Panel -->
     <div id="info-panel">
         <div class="info-number">1</div>
         <button class="info-close">×</button>
