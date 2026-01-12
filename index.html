@@ -9,11 +9,10 @@
 </head>
 <body>
 
-    <!-- Pantalla de carga con diagnóstico -->
+    <!-- Pantalla de carga -->
     <div id="loading">
         <div class="loader"></div>
-        <p id="loading-text" style="margin-top:20px; font-weight:bold;">Cargando modelo 3D RIT...</p>
-        <div id="error-details" style="display:none; color: #ff3333; margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.1); border-radius: 5px; max-width: 90%; font-size: 14px;"></div>
+        <p id="loading-text">Cargando modelo de alta definición...</p>
     </div>
 
     <!-- Panel Lateral Izquierdo -->
@@ -24,13 +23,14 @@
         </div>
         <div class="panel-content">
             <div class="instruccion">
-                🖱️ Haz clic en un botón para inspeccionar.
+                🖱️ Selecciona un componente para inspeccionar.
             </div>
             <div class="section-title">Componentes de la Red</div>
             <div id="menu-items"></div>
         </div>
     </div>
 
+    <!-- Botón Etiquetas -->
     <button id="toggle-labels">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M7 7h10v10M7 17L17 7"/>
@@ -38,21 +38,30 @@
         Mostrar Etiquetas
     </button>
 
+    <!-- Botones de Vistas (Iconos) -->
     <div id="view-presets">
-        <button class="preset-btn" data-view="iso" title="Vista General">Iso</button>
-        <button class="preset-btn" data-view="front" title="Vista Frontal">Frente</button>
-        <button class="preset-btn" data-view="side" title="Vista Lateral">Lado</button>
-        <button class="preset-btn" data-view="top" title="Vista Superior">Arriba</button>
+        <button class="preset-btn" data-view="iso" title="Isométrica">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </button>
+        <button class="preset-btn" data-view="front" title="Frontal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+        </button>
+        <button class="preset-btn" data-view="side" title="Lateral">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 12h18"/></svg>
+        </button>
+        <button class="preset-btn" data-view="top" title="Superior">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
     </div>
 
+    <!-- Controles de Navegación Inferior -->
     <div id="nav-controls">
         <div class="nav-group">
-            <div class="btn-row">
-                <button class="nav-btn reset-btn" data-action="reset" title="Reiniciar">⟲</button>
-            </div>
+            <button class="nav-btn reset-btn" data-action="reset" title="Restablecer">⟲ Reset</button>
         </div>
     </div>
 
+    <!-- Leyenda -->
     <div id="legend">
         <b>REFERENCIA</b>
         <div class="legend-item"><span class="color-dot" style="background: #ff4d00;"></span><span>Troncal</span></div>
@@ -61,6 +70,7 @@
         <div class="legend-item"><span class="color-dot" style="background: #ffc107;"></span><span>Usuario</span></div>
     </div>
 
+    <!-- Panel de Información -->
     <div id="info-panel">
         <div class="info-number">1</div>
         <button class="info-close">×</button>
@@ -70,7 +80,6 @@
 
     <div id="container"></div>
 
-    <!-- 1. Mapa de Importación -->
     <script type="importmap">
     {
         "imports": {
@@ -79,32 +88,6 @@
         }
     }
     </script>
-
-    <!-- 2. Script de Diagnóstico (Si falla JS, esto te avisa) -->
-    <script>
-        window.onload = function() {
-            setTimeout(() => {
-                const loader = document.getElementById('loading');
-                if (loader && !loader.classList.contains('hidden')) {
-                    const errorDiv = document.getElementById('error-details');
-                    const text = document.getElementById('loading-text');
-                    
-                    text.innerText = "⚠️ Tiempo de espera agotado";
-                    errorDiv.style.display = 'block';
-                    errorDiv.innerHTML = `
-                        El archivo <b>script.js</b> no ha respondido.<br><br>
-                        <b>Posibles soluciones:</b><br>
-                        1. Asegúrate que el archivo se llame <b>script.js</b> (minúsculas).<br>
-                        2. Presiona <b>CTRL + F5</b> para limpiar caché.<br>
-                        3. Revisa si Three.js está bloqueado por tu red.
-                    `;
-                }
-            }, 6000); // Espera 6 segundos antes de reportar error
-        };
-    </script>
-
-    <!-- 3. Carga del Script Principal (Corrección de ruta) -->
     <script type="module" src="./script.js"></script>
-
 </body>
 </html>
