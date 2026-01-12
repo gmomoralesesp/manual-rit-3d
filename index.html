@@ -12,7 +12,8 @@
     <!-- Pantalla de carga -->
     <div id="loading">
         <div class="loader"></div>
-        <p>Cargando modelo 3D RIT...</p>
+        <p id="loading-text">Cargando modelo 3D RIT...</p>
+        <div id="error-log" style="display:none; color: red; margin-top: 10px; font-size: 12px; max-width: 80%; text-align: center;"></div>
     </div>
 
     <!-- Panel Lateral Izquierdo -->
@@ -112,7 +113,7 @@
     <!-- Contenedor 3D Principal -->
     <div id="container"></div>
 
-    <!-- Importación de Three.js -->
+    <!-- Importación de Three.js (IMPORTANTE: Mantenido unpkg, asegura conexión a internet) -->
     <script type="importmap">
     {
         "imports": {
@@ -121,6 +122,23 @@
         }
     }
     </script>
-    <script type="module" src="script.js"></script>
+    
+    <!-- Carga del script con manejo de errores -->
+    <script type="module">
+        import './script.js';
+    </script>
+    
+    <!-- Script de seguridad por si el módulo falla -->
+    <script>
+        window.onerror = function(message, source, lineno, colno, error) {
+            const loadingText = document.getElementById('loading-text');
+            const errorLog = document.getElementById('error-log');
+            if (loadingText && errorLog) {
+                loadingText.innerText = "Error al cargar.";
+                errorLog.style.display = 'block';
+                errorLog.innerText = "Detalle: " + message;
+            }
+        };
+    </script>
 </body>
 </html>
