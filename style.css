@@ -1,177 +1,125 @@
-/* Reseteo Básico */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { 
     font-family: 'Roboto', sans-serif; 
-    background: #e0e3e6; /* Color de fondo si el 3D carga lento */
-    color: #333; 
-    overflow: hidden; 
-    width: 100vw; 
-    height: 100vh;
+    background: #e0e3e6; 
+    overflow: hidden; width: 100vw; height: 100vh;
 }
 
-/* Contenedor 3D - Fondo absoluto */
 #container { 
-    position: absolute; 
-    top: 0; left: 0; 
-    width: 100%; height: 100%; 
-    z-index: 1; 
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; 
     background: linear-gradient(to bottom, #f0f2f5 0%, #dce0e6 100%);
 }
 
-/* --- Panel Lateral Izquierdo --- */
+/* Panel Lateral */
 #side-panel {
     position: absolute; top: 20px; left: 20px; width: 340px;
-    background: #23232f; /* Fondo oscuro sólido para mejor contraste */
-    border-radius: 12px;
-    z-index: 10; 
-    max-height: calc(100vh - 40px); 
-    display: flex; flex-direction: column;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-    border: 1px solid rgba(255,255,255,0.05);
+    background: #23232f; border-radius: 12px; z-index: 10; 
+    max-height: calc(100vh - 40px); display: flex; flex-direction: column;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05);
 }
 
 .panel-header {
-    background: #ff5500;
-    padding: 18px 20px;
-    border-radius: 12px 12px 0 0;
-    color: white;
+    background: #ff5500; padding: 18px 20px; border-radius: 12px 12px 0 0; color: white;
 }
-.panel-header h1 { font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-.panel-header h1::before { content: '🏢'; font-size: 1.4rem; }
-.panel-header .subtitle { font-size: 0.75rem; opacity: 0.9; margin-top: 4px; font-weight: 400; }
+.panel-header h1 { font-size: 1.2rem; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+.panel-header h1::before { content: '🏢'; }
+.panel-header .subtitle { font-size: 0.75rem; opacity: 0.9; font-weight: 400; }
 
-.panel-content {
-    padding: 15px;
-    overflow-y: auto;
-    flex: 1;
-}
-/* Scrollbar bonita */
+.panel-content { padding: 15px; overflow-y: auto; flex: 1; }
 .panel-content::-webkit-scrollbar { width: 6px; }
-.panel-content::-webkit-scrollbar-track { background: #2c2c38; }
 .panel-content::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
 
-.instruccion {
-    font-size: 0.8rem; color: #aaa; margin-bottom: 15px;
-    line-height: 1.4; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1);
-}
+.instruccion { font-size: 0.8rem; color: #aaa; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+.section-title { font-size: 0.7rem; color: #888; text-transform: uppercase; margin: 10px 0; letter-spacing: 1px; }
 
 .rit-item {
     display: flex; align-items: center; padding: 12px; margin-bottom: 8px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px; cursor: pointer;
-    transition: all 0.2s;
-    border-left: 3px solid transparent;
+    background: rgba(255, 255, 255, 0.05); border-radius: 8px; cursor: pointer;
+    transition: all 0.2s; border-left: 3px solid transparent;
 }
 .rit-item:hover { background: rgba(255, 255, 255, 0.1); }
-.rit-item.active {
-    background: rgba(255, 85, 0, 0.15);
-    border-left: 3px solid #ff5500;
-}
+.rit-item.active { background: rgba(255, 85, 0, 0.15); border-left: 3px solid #ff5500; }
 
 .number-badge {
-    background: #ff5500; color: white;
-    width: 28px; height: 28px;
-    border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 0.85rem;
-    margin-right: 12px; flex-shrink: 0;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    background: #ff5500; color: white; width: 28px; height: 28px;
+    border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.85rem; margin-right: 12px; flex-shrink: 0;
 }
 
 .text-content b { display: block; color: #4cc9f0; font-size: 0.9rem; margin-bottom: 2px; }
 .rit-item.active .text-content b { color: #fff; }
 .text-content span { font-size: 0.75rem; color: #999; display: block; line-height: 1.2; }
 
-/* --- UI Flotante --- */
+/* Botones Superiores */
 #toggle-labels {
-    position: absolute; top: 20px; left: 380px;
-    padding: 10px 16px; background: white; border: none;
-    border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600;
-    color: #444; z-index: 10;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    display: flex; align-items: center; gap: 6px;
-    transition: transform 0.2s;
+    position: absolute; top: 20px; left: 380px; padding: 10px 16px; 
+    background: white; border: none; border-radius: 8px; cursor: pointer; 
+    font-size: 0.85rem; font-weight: 600; color: #444; z-index: 10;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 6px;
 }
-#toggle-labels:hover { transform: translateY(-2px); color: #ff5500; }
+#toggle-labels:hover { color: #ff5500; transform: translateY(-2px); }
 #toggle-labels.active { background: #ff5500; color: white; }
 
 #view-presets {
-    position: absolute; top: 20px; right: 20px; z-index: 10;
-    display: flex; gap: 8px;
+    position: absolute; top: 20px; right: 20px; z-index: 10; display: flex; gap: 8px;
 }
 .preset-btn {
     width: 40px; height: 40px; border: none; background: white;
     border-radius: 8px; cursor: pointer; color: #555;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center;
     transition: all 0.2s;
 }
 .preset-btn:hover { color: #ff5500; transform: scale(1.05); }
 .preset-btn svg { width: 20px; height: 20px; }
 
+/* Controles Inferiores */
 #nav-controls {
-    position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-    background: white; padding: 10px 20px; border-radius: 12px;
-    display: flex; gap: 20px; z-index: 10;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+    z-index: 10;
 }
-.nav-group-label { font-size: 0.65rem; color: #999; text-transform: uppercase; margin-bottom: 4px; text-align: center; }
-.btn-row { display: flex; gap: 5px; }
 .nav-btn {
-    width: 32px; height: 32px; border: 1px solid #eee; background: #f9f9f9;
-    border-radius: 6px; cursor: pointer; color: #444; font-size: 1rem;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.2s;
+    padding: 10px 20px; background: white; border: none; border-radius: 20px;
+    font-weight: bold; color: #00b4d8; cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: transform 0.2s;
 }
-.nav-btn:hover { background: #ff5500; color: white; border-color: #ff5500; }
-.reset-btn { color: #00b4d8; }
+.nav-btn:hover { transform: scale(1.05); background: #f0fbff; }
 
+/* Leyenda */
 #legend {
     position: absolute; bottom: 20px; right: 20px;
     background: #23232f; color: white; padding: 15px; border-radius: 10px;
-    z-index: 10; font-size: 0.8rem;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    z-index: 10; font-size: 0.8rem; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 #legend b { display: block; margin-bottom: 10px; color: #eee; font-size: 0.7rem; letter-spacing: 1px; }
 .legend-item { display: flex; align-items: center; margin-bottom: 6px; }
-.color-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; display: inline-block; }
+.color-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; }
 
-/* Info Panel Flotante */
+/* Info Panel */
 #info-panel {
     position: absolute; top: 50%; right: 200px; transform: translateY(-50%);
     width: 280px; background: white; padding: 20px; border-radius: 12px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-    opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s;
-    z-index: 20; border-left: 4px solid #ff5500;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2); opacity: 0; pointer-events: none; 
+    transition: all 0.3s; z-index: 20; border-left: 4px solid #ff5500;
 }
 #info-panel.visible { opacity: 1; pointer-events: auto; transform: translateY(-50%) translateX(0); }
 .info-number { 
-    position: absolute; top: -15px; left: -15px; 
-    background: #ff5500; color: white; width: 34px; height: 34px; 
-    border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;
-    box-shadow: 0 4px 10px rgba(255, 85, 0, 0.4);
+    position: absolute; top: -15px; left: -15px; background: #ff5500; color: white; 
+    width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; 
+    justify-content: center; font-weight: bold; box-shadow: 0 4px 10px rgba(255, 85, 0, 0.4);
 }
 .info-close { position: absolute; top: 10px; right: 10px; border: none; background: none; font-size: 1.2rem; cursor: pointer; color: #999; }
 .info-title { font-size: 1.1rem; font-weight: 700; color: #333; margin: 10px 0 5px; }
 .info-desc { font-size: 0.9rem; color: #666; line-height: 1.5; }
 
+/* Loading */
 #loading {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: #f0f2f5; z-index: 9999;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    transition: opacity 0.5s;
+    background: #f0f2f5; z-index: 9999; display: flex; flex-direction: column; 
+    align-items: center; justify-content: center; transition: opacity 0.5s;
 }
 #loading.hidden { opacity: 0; pointer-events: none; }
 .loader {
-    width: 40px; height: 40px; border: 4px solid #ff5500;
-    border-bottom-color: transparent; border-radius: 50%;
-    animation: spin 1s linear infinite;
+    width: 40px; height: 40px; border: 4px solid #ff5500; border-bottom-color: transparent; 
+    border-radius: 50%; animation: spin 1s linear infinite;
 }
 @keyframes spin { 100% { transform: rotate(360deg); } }
-
-#tooltip {
-    position: absolute; background: rgba(0,0,0,0.8); color: white;
-    padding: 5px 10px; border-radius: 4px; font-size: 0.75rem;
-    pointer-events: none; opacity: 0; z-index: 100;
-}
-#tooltip.visible { opacity: 1; }
